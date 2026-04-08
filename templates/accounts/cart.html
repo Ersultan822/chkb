@@ -1,0 +1,52 @@
+{% extends 'accounts/base.html' %}
+{% block title %}Корзина{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Корзина</h2>
+      <p class="muted">SQLite-та сақталған тауарлар.</p>
+    </div>
+
+    <div class="card">
+      {% if items %}
+        {% for item in items %}
+          <div class="card" style="margin:12px 0;">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+              <div>
+                <b>{{ item.product.name }}</b>
+                <div class="muted small">{{ item.quantity }} дана</div>
+                <div class="muted small">{{ item.product.price }} ₸</div>
+                <div class="muted small">Жалпы: {{ item.total_price }} ₸</div>
+              </div>
+
+              <form method="POST" action="{% url 'remove_from_cart' item.id %}">
+                {% csrf_token %}
+                <button class="btn danger" type="submit">Удалить</button>
+              </form>
+            </div>
+          </div>
+        {% endfor %}
+
+        <h3 style="margin-top:16px;">Итого: {{ total_price }} ₸</h3>
+
+        <div class="actions" id="cartActions">
+          <a class="btn primary" href="{% url 'checkout' %}">Оплатаға өту</a>
+          <a class="btn" href="{% url 'home' %}#products">Каталогқа қайту</a>
+
+          <form method="POST" action="{% url 'clear_cart' %}" style="display:inline;">
+            {% csrf_token %}
+            <button class="btn danger" type="submit">Корзинаны тазалау</button>
+          </form>
+        </div>
+      {% else %}
+        <div class="muted">Корзина бос.</div>
+        <div class="actions" style="margin-top:16px;">
+          <a class="btn" href="{% url 'home' %}#products">Каталогқа қайту</a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

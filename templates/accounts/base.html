@@ -1,0 +1,105 @@
+{% load static %}
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}TULGA{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'accounts/style.css' %}">
+</head>
+
+<body data-auth="{% if user.is_authenticated %}true{% else %}false{% endif %}">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <span>📦 Қазақстан бойынша жеткізу</span>
+      <span>💬 WhatsApp: +7 (777) 777-77-77</span>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header" id="top">
+    <div class="container header-inner">
+
+      <a class="brand" href="{% url 'home' %}">TULGA</a>
+
+      <nav class="nav">
+        <a href="{% url 'home' %}#products">Каталог</a>
+        <a href="{% url 'home' %}#support">Техқолдау</a>
+        <a href="{% url 'home' %}#download">PDF жүктеу</a>
+        <a href="{% url 'home' %}#order">Тапсырыс</a>
+
+        {% if user.is_authenticated %}
+          <a href="{% url 'my_orders' %}">Менің заказдарым</a>
+        {% endif %}
+      </nav>
+
+      <div class="header-actions">
+
+        <!-- 🌙 DARK MODE -->
+        <button class="icon-btn" id="themeToggle" title="Theme">🌙</button>
+
+        <!-- CART -->
+        <a class="icon-btn" href="{% url 'cart' %}" title="Корзина">🛒</a>
+
+        <!-- PROFILE -->
+        {% if user.is_authenticated %}
+          <a class="icon-btn profile-nav-btn" href="{% url 'profile' %}">
+            {% if user.profile_photo %}
+              <img src="{{ user.profile_photo.url }}" class="nav-avatar">
+            {% else %}
+              <img src="/media/default/default-avatar.png" class="nav-avatar">
+            {% endif %}
+          </a>
+        {% else %}
+          <a class="icon-btn" href="{% url 'login' %}">👤</a>
+        {% endif %}
+
+      </div>
+    </div>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span>©️ TULGA</span>
+      <span class="muted small">Django + SQLite</span>
+    </div>
+  </footer>
+
+  <!-- CHAT BUTTON -->
+  <button class="tulga-chat-toggle" id="chatToggle">💬</button>
+
+  <!-- CHAT -->
+  <div class="tulga-chat-widget" id="chatBox">
+
+    <div class="tulga-chat-header">
+      <div>
+        <div class="tulga-chat-title">TULGA Assistant</div>
+        <div class="tulga-chat-subtitle">Сайт бойынша көмекші</div>
+      </div>
+      <button class="tulga-chat-close" id="chatClose">×</button>
+    </div>
+
+    <div class="tulga-chat-body" id="chatBody">
+      <div class="tulga-chat-msg bot">
+        <div class="tulga-chat-bubble">
+          Сәлем! Мен TULGA көмекшісімін.
+        </div>
+      </div>
+    </div>
+
+    <div class="tulga-chat-input-wrap">
+      <button id="voiceBtn">🎤</button>
+      <input id="chatInput" placeholder="Жазыңыз...">
+      <button id="chatSend">Жіберу</button>
+    </div>
+
+  </div>
+
+  <script src="{% static 'accounts/script.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+{% extends 'accounts/base.html' %}
+{% block title %}TULGA — Ноутбуктар мен ПК{% endblock %}
+
+{% block content %}
+<main>
+  <section class="hero">
+    <div class="container hero-grid">
+      <div class="hero-text">
+        <h1>TULGA Store — ноутбуктар мен компьютерлер</h1>
+        <p class="muted">Django жобасы: тіркелу, кіру, база, админка, профиль фото.</p>
+        <div class="hero-cta">
+          <a class="btn primary" href="#products">Каталогқа өту</a>
+          <a class="btn" href="#support">Ноут таңдау көмегі</a>
+        </div>
+        <div class="hero-badges">
+          <div class="badge">✅ FORM</div>
+          <div class="badge">🧠 JS</div>
+          <div class="badge">📄 PDF</div>
+          <div class="badge">🛟 Support</div>
+        </div>
+      </div>
+
+      <div class="hero-card">
+        <div class="hero-img" aria-hidden="true"></div>
+        <div class="hero-card-body">
+          <div class="hero-price">
+            <span class="muted">Бағалар</span>
+            <span class="price">189 990 ₸ бастап</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="products">
+    <div class="container">
+      <div class="section-head">
+        <h2>Каталог</h2>
+        <p class="muted">SQLite-тен шығатын тауарлар.</p>
+      </div>
+
+      <div class="grid cards" id="cardsGrid">
+        {% for product in products %}
+          <article class="product">
+            {% if product.image_main %}
+              <div class="card-image" style="background-image:url('{{ product.image_main.url }}'); background-size:cover; background-position:center;" aria-hidden="true"></div>
+            {% else %}
+              <div class="card-image" aria-hidden="true"></div>
+            {% endif %}
+
+            <div class="pbody">
+              <h3 class="ptitle">{{ product.name }}</h3>
+              <p class="muted small">
+                {{ product.processor }} • {{ product.ram }} • {{ product.storage }} • {{ product.screen }}
+                {% if product.gpu %} • {{ product.gpu }}{% endif %}
+              </p>
+
+              <div class="meta">
+                <span class="tag">{{ product.get_category_display }}</span>
+                <strong>{{ product.price }} ₸</strong>
+              </div>
+
+              <p class="muted small" style="margin-top:10px;">{{ product.description }}</p>
+
+              <div class="actions">
+                <button class="btn primary pickProduct" type="button" data-name="{{ product.name }}">Таңдау</button>
+
+                {% if user.is_authenticated %}
+                  <form method="POST" action="{% url 'add_to_cart' product.slug %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button class="btn" type="submit">Заказ беру</button>
+                  </form>
+                {% else %}
+                  <a class="btn" href="{% url 'login' %}">Заказ беру</a>
+                {% endif %}
+
+                <a class="btn" href="#download">PDF</a>
+              </div>
+            </div>
+          </article>
+        {% empty %}
+          <p class="muted">Қазір каталогта тауар жоқ.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="support">
+    <div class="container">
+      <div class="section-head">
+        <h2>Техқолдау: ноутбук таңдауға көмектесу</h2>
+        <p class="muted">Талаптарыңды белгіле → “Ұсыну” бас.</p>
+      </div>
+
+      <div class="support-grid">
+        <div class="card">
+          <form id="supportForm" method="post" action="#">
+            <div class="support-block">
+              <h3 class="support-title">1) Қай мақсатқа керек?</h3>
+              <label class="opt"><input type="radio" name="use" value="study" checked> Оқу / офис</label>
+              <label class="opt"><input type="radio" name="use" value="gaming"> Ойын</label>
+              <label class="opt"><input type="radio" name="use" value="work"> Жұмыс</label>
+            </div>
+
+            <div class="support-block">
+              <h3 class="support-title">2) Бюджет</h3>
+              <label class="field">
+                <select name="budget" required>
+                  <option value="0-220">220 000 ₸ дейін</option>
+                  <option value="220-450">220 000 – 450 000 ₸</option>
+                  <option value="450+">450 000 ₸ жоғары</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="support-block">
+              <h3 class="support-title">3) Міндетті талаптар</h3>
+              <div class="grid2">
+                <label class="check"><input type="checkbox" name="req" value="ssd512"> SSD кемі 512GB</label>
+                <label class="check"><input type="checkbox" name="req" value="ssd1tb"> SSD 1TB</label>
+                <label class="check"><input type="checkbox" name="req" value="ram16"> RAM 16GB</label>
+                <label class="check"><input type="checkbox" name="req" value="ram32"> RAM 32GB</label>
+                <label class="check"><input type="checkbox" name="req" value="gpuRTX"> RTX видеокарта</label>
+                <label class="check"><input type="checkbox" name="req" value="portable"> Портатив</label>
+              </div>
+            </div>
+
+            <div class="support-block">
+              <h3 class="support-title">4) Экран өлшемі</h3>
+              <label class="opt"><input type="radio" name="screen" value="15" checked> 15–15.6"</label>
+              <label class="opt"><input type="radio" name="screen" value="16"> 16"</label>
+              <label class="opt"><input type="radio" name="screen" value="any"> Маңызды емес</label>
+            </div>
+
+            <div class="actions">
+              <button class="btn primary" type="button" id="supportRun">Ұсыну</button>
+              <button class="btn danger" type="reset" id="supportReset">Тазалау</button>
+            </div>
+
+            <p class="note" id="supportNote"></p>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3 class="support-title">Ұсынылған нұсқа</h3>
+          <div id="supportResult" class="support-result muted">
+            Талаптарды таңдаңыз да “Ұсыну” басыңыз.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="download">
+    <div class="container">
+      <div class="section-head">
+        <h2>PDF жүктеу</h2>
+        <p class="muted">Гарантия және Нұсқаулық.</p>
+      </div>
+
+      <div class="card">
+        <div class="info-line">
+          <span class="muted">Таңдалған тауар:</span>
+          <b id="chosenProduct">— таңдалмаған</b>
+        </div>
+
+        <form id="downloadForm" method="get" action="#">
+          <div class="grid2">
+            <label class="check">
+              <input type="checkbox" name="dl" value="warranty">
+              <span>Гарантия (PDF)</span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" name="dl" value="manual">
+              <span>Нұсқаулық / Инструкция (PDF)</span>
+            </label>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" type="button" id="downloadBtn">Таңдалғанды жүктеу</button>
+            <button class="btn danger" type="button" id="clearDl">Белгілерді алып тастау</button>
+          </div>
+
+          <p class="note" id="dlNote"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt" id="order">
+    <div class="container">
+      <div class="section-head">
+        <h2>Тапсырыс беру</h2>
+      </div>
+
+      <div class="card">
+        <form id="orderForm" method="post" action="#">
+          <div class="grid2">
+            <label class="field">Аты
+              <input type="text" name="name" required minlength="2" placeholder="Ерсултан">
+            </label>
+
+            <label class="field">Телефон
+              <input type="tel" name="phone" required placeholder="+7 7xx xxx xx xx">
+            </label>
+
+            <label class="field">Тауар
+              <select name="product" required>
+                <option value="">Таңдаңыз</option>
+                {% for product in products %}
+                  <option value="{{ product.name }}">{{ product.name }}</option>
+                {% endfor %}
+              </select>
+            </label>
+
+            <label class="field">Срочность
+              <input type="range" id="urgency" name="urgency" min="1" max="10" value="5">
+              <span class="muted small">Мәні: <b id="urgencyVal">5</b>/10</span>
+            </label>
+
+            <label class="field full">Комментарий
+              <textarea name="comment" rows="3" placeholder="Қала, адрес, комментарий..."></textarea>
+            </label>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" type="submit">Жіберу (демо)</button>
+            <button class="btn danger" type="reset">Тазалау</button>
+          </div>
+
+          <p class="note" id="orderNote"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

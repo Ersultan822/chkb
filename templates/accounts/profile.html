@@ -1,0 +1,154 @@
+{% extends 'accounts/base.html' %}
+{% block title %}Мой аккаунт{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="card profile-page" style="max-width:760px;margin:0 auto">
+      <div class="section-head">
+        <h2>Мой аккаунт</h2>
+        <p class="muted">Тіркелген деректер және өзгерту.</p>
+      </div>
+
+      <div class="card profile-top-card">
+        {% if user.profile_photo %}
+          <img src="{{ user.profile_photo.url }}" class="profile-avatar">
+        {% else %}
+          <img src="/media/default/default-avatar.png" class="profile-avatar">
+        {% endif %}
+        <div class="profile-user-name">
+          {{ user.first_name }} {{ user.last_name }}
+        </div>
+        <div class="muted profile-user-email">{{ user.email }}</div>
+        <div class="muted profile-user-email">{{ user.phone_number }}</div>
+      </div>
+
+      <div class="profile-action-buttons">
+        <button type="button" class="btn primary" id="toggleProfileBtn">Профильді өзгерту</button>
+        <button type="button" class="btn" id="togglePasswordBtn">Пароль өзгерту</button>
+      </div>
+
+      <div class="card profile-box" id="profileBox">
+        <h3 style="margin:0 0 14px">Профильді өзгерту</h3>
+
+        {% if profile_message %}
+          <p class="note" style="color:#7dff9f">{{ profile_message }}</p>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" class="custom-form">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label for="{{ profile_form.username.id_for_label }}">Имя пользователя</label>
+            {{ profile_form.username }}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ profile_form.first_name.id_for_label }}">Имя</label>
+            {{ profile_form.first_name }}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ profile_form.last_name.id_for_label }}">Фамилия</label>
+            {{ profile_form.last_name }}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ profile_form.email.id_for_label }}">Email</label>
+            {{ profile_form.email }}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ profile_form.phone_number.id_for_label }}">Телефон номер</label>
+            {{ profile_form.phone_number }}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ profile_form.bio.id_for_label }}">О себе</label>
+            {{ profile_form.bio }}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ profile_form.profile_photo.id_for_label }}">Фото профиля</label>
+            {{ profile_form.profile_photo }}
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" type="submit" name="save_profile">Сақтау</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card profile-box" id="passwordBox" style="display:none;">
+        <h3 style="margin:0 0 14px">Пароль өзгерту</h3>
+
+        {% if password_message %}
+          <p class="note" style="color:#7dff9f">{{ password_message }}</p>
+        {% endif %}
+
+        <form method="POST" class="custom-form">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label for="{{ password_form.old_password.id_for_label }}">Ескі пароль</label>
+            {{ password_form.old_password }}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ password_form.new_password1.id_for_label }}">Жаңа пароль</label>
+            {{ password_form.new_password1 }}
+            {% if password_form.new_password1.help_text %}
+              <small class="form-help">{{ password_form.new_password1.help_text }}</small>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label for="{{ password_form.new_password2.id_for_label }}">Қайта енгізу</label>
+            {{ password_form.new_password2 }}
+            {% if password_form.new_password2.help_text %}
+              <small class="form-help">{{ password_form.new_password2.help_text }}</small>
+            {% endif %}
+          </div>
+
+          {% if password_form.non_field_errors %}
+            {% for error in password_form.non_field_errors %}
+              <p class="form-error">{{ error }}</p>
+            {% endfor %}
+          {% endif %}
+
+          <div class="actions">
+            <button class="btn primary" type="submit" name="change_password">Өзгерту</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="actions" style="margin-top:14px">
+        <a class="btn" href="{% url 'my_orders' %}">Менің заказдарым</a>
+        <a class="btn danger" href="{% url 'logout' %}">Выход</a>
+        <a class="btn" href="{% url 'home' %}">Басты бетке</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const toggleProfileBtn = document.getElementById('toggleProfileBtn');
+  const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+  const profileBox = document.getElementById('profileBox');
+  const passwordBox = document.getElementById('passwordBox');
+
+  toggleProfileBtn.addEventListener('click', function () {
+    profileBox.style.display = 'block';
+    passwordBox.style.display = 'none';
+    toggleProfileBtn.classList.add('primary');
+    togglePasswordBtn.classList.remove('primary');
+  });
+
+  togglePasswordBtn.addEventListener('click', function () {
+    profileBox.style.display = 'none';
+    passwordBox.style.display = 'block';
+    togglePasswordBtn.classList.add('primary');
+    toggleProfileBtn.classList.remove('primary');
+  });
+</script>
+{% endblock %}

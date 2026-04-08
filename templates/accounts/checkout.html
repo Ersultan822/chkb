@@ -1,0 +1,34 @@
+{% extends 'accounts/base.html' %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Сатып алу</h2>
+      <p class="muted">Төмендегі товарлар заказға өтеді.</p>
+    </div>
+
+    <div class="card">
+      {% if items %}
+        {% for item in items %}
+          <div class="card" style="margin:12px 0;">
+            <b>{{ item.product.name }}</b>
+            <div class="muted small">{{ item.quantity }} дана</div>
+            <div class="muted small">{{ item.total_price }} ₸</div>
+          </div>
+        {% endfor %}
+
+        <h3 style="margin-top:16px;">Жалпы сумма: {{ total_price }} ₸</h3>
+
+        <form method="POST" style="margin-top:18px;">
+          {% csrf_token %}
+          <button class="btn primary" type="submit">Төлеу және заказ жасау</button>
+        </form>
+      {% else %}
+        <p class="muted">Checkout жасауға товар жоқ.</p>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}
